@@ -13,8 +13,9 @@ io.on('connection', (socket) => {
         console.log('user disconnected');
       });
 
-    socket.on('message', (msg) => {
-    console.log('msg: ' + msg);
+    socket.on('msg', (msg) => {
+        console.log('msg: ' + msg);
+        io.emit('msg', msg);
     });
     // app.send('Dead')
     // socket.emit('message', 'Hello world');
