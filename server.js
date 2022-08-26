@@ -9,6 +9,8 @@ const io = new Server(server);
 
 io.on('connection', (socket) => {
     console.log('a user connected');
+    io.emit('user', 'userIsDead');
+
     socket.on('disconnect', () => {
         console.log('user disconnected');
       });
@@ -17,6 +19,8 @@ io.on('connection', (socket) => {
         console.log('msg: ' + msg);
         io.emit('msg', msg);
     });
+
+    // io.emit('newMsg', msg+"hard");
     // app.send('Dead')
     // socket.emit('message', 'Hello world');
     // socket.on('disconnect', () => {
@@ -28,6 +32,10 @@ io.on('connection', (socket) => {
 
 app.get('/', (req, res) => {
     res.sendFile('E:/Just Some Files/C#/index.html');
+    // setInterval(() => {
+    //     res.send('olo');
+    // },1000)
+    // res.sendFile('E:/Just Some Files/C#/main.js');
 })
 
 server.listen(3000, () => {

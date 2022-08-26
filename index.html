@@ -39,7 +39,11 @@
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
     });
+
+    socket.on('user', (user) => {
+        console.log(user);
+    })
     </script>
 </body>
-<script defer src="./main.js"></script>
+<!-- <script defer src="./main.js"></script> -->
 </html>
