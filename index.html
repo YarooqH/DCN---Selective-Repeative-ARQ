@@ -10,13 +10,33 @@
     * {
         box-sizing: border-box;
     }
+
+    .container{
+        display: flex;
+        /* align-items: center; */
+        justify-content: space-evenly;
+        /* gap: 200px; */
+        /* ju */
+    }
+
 </style>
 <body>
-    <h1>Send Packet</h1>    
-    <ul id="messages"></ul>
-    <form id="form" action="">
-        <input id="input" autocomplete="off" /><button>Send</button>
-      </form>
+    <div class="container">
+        <div class="client-container">
+            <h1>Client</h1>    
+            <form id="form" action="">
+                <input id="input" autocomplete="off" /><button>Send</button>
+            </form>
+            <ul id="messages"></ul>
+        </div>
+        <div class="server-container">
+            <h1>Server</h1>    
+            <form id="server-form" action="">
+                <input id="server-input" autocomplete="off" /><button>Send</button>
+            </form>
+            <ul id="server-messages"></ul>
+        </div>
+    </div>
     <script src="/socket.io/socket.io.js"></script>
     <script>
     var socket = io();
@@ -24,14 +44,29 @@
     var messages = document.getElementById('messages');
     var form = document.getElementById('form');
     var input = document.getElementById('input');
+    var count = 1;
+
+    var serverMsgs = document.getElementById('server-messages');
+    var serverForm = document.getElementById('server-form');
+    var serverInput = document.getElementById('server-input');
+    
 
     form.addEventListener('submit', function(e) {
     e.preventDefault();
     if (input.value) {
-      socket.emit('msg', input.value);
+      socket.emit('clientmsg', input.value);
       input.value = '';
     }
     });
+
+    serverForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (serverInput.value) {
+      socket.emit('servermsg', serverInput.value);
+      serverInput.value = '';
+    }
+    });
+
 
     socket.on('msg', function(msg) {
         var item = document.createElement('li');
@@ -43,7 +78,13 @@
     socket.on('user', (user) => {
         console.log(user);
     })
+
+    socket.on('hello', (msg) => {
+        var item = document.createElement('li');
+        item.textContent = msg + ' ' + count;
+        messages.appendChild(item);
+        count += 1;
+    })
     </script>
 </body>
-<!-- <script defer src="./main.js"></script> -->
 </html>
