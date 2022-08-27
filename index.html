@@ -18,12 +18,21 @@
         /* gap: 200px; */
         /* ju */
     }
+    #form {
+        margin-top: 22px;
+    }
 
 </style>
 <body>
     <div class="container">
         <div class="client-container">
-            <h1>Client</h1>    
+            <h1>Client</h1>               
+            <p>Accept Packets</p> 
+            <button id="client-packets">Accept</button>
+            <!-- <input type="radio" id="client-on" name="client" value="true" checked>
+            <label for="client-on">Accept</label><br>
+            <input type="radio" id="client-off" name="client" value="false">
+            <label for="client-off">Decline</label><br> -->
             <form id="form" action="">
                 <input id="input" autocomplete="off" /><button>Send</button>
             </form>
@@ -32,7 +41,8 @@
         <div class="server-container">
             <h1>Server</h1>    
             <form id="server-form" action="">
-                <input id="server-input" autocomplete="off" /><button>Send</button>
+                <input id="server-input" type="number" />
+                <button id="start-btn">Start</button>
             </form>
             <ul id="server-messages"></ul>
         </div>
@@ -44,29 +54,55 @@
     var messages = document.getElementById('messages');
     var form = document.getElementById('form');
     var input = document.getElementById('input');
+    var clientPacket = document.getElementById('client-packets');
     var count = 1;
 
     var serverMsgs = document.getElementById('server-messages');
     var serverForm = document.getElementById('server-form');
     var serverInput = document.getElementById('server-input');
-    
+
+    var serverStartBtn = document.getElementById('start-btn');    
+
+    let clientPacketStatus = true;
+    clientPacket.style.color = 'green';
 
     form.addEventListener('submit', function(e) {
     e.preventDefault();
     if (input.value) {
-      socket.emit('clientmsg', input.value);
+      socket.emit('clientMsg', input.value);
       input.value = '';
     }
     });
 
-    serverForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    if (serverInput.value) {
-      socket.emit('servermsg', serverInput.value);
-      serverInput.value = '';
-    }
+    clientPacket.addEventListener('click', () => {
+        if(clientPacketStatus){
+            clientPacketStatus = false;
+            clientPacket.innerText = 'Decline';
+            clientPacket.style.color = 'red';
+        } else {
+            clientPacketStatus = true;
+            clientPacket.innerText = 'Accept';
+            clientPacket.style.color = 'green';
+        }
+    })
+
+    serverStartBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (serverInput.value) {
+            socket.emit('startServer', 'start');
+            // console.log(parseInt(serverInput.value));
+            let loopCount = parseInt(serverInput.value);
+            console.log(loopCount);
+            // for (let index = 0; index < loopCount; index++) {
+                // console.log(loopCount+1);
+            
+            socket.emit('hi', loopCount);
+            // }
+            serverInput.value = '';
+        }
     });
 
+    
 
     socket.on('msg', function(msg) {
         var item = document.createElement('li');
@@ -75,15 +111,20 @@
         window.scrollTo(0, document.body.scrollHeight);
     });
 
-    socket.on('user', (user) => {
-        console.log(user);
+    socket.on('initPacket', (packet) => {
+        console.log(packet);
+        socket.emit('clientAck', 'clientAck');
     })
 
-    socket.on('hello', (msg) => {
+    socket.on('serverPacket', (packet) => {
+        console.log(packet);
+        socket.emit('clientAck', 'clientAck');
+    })
+
+    socket.on('packetR', (msg) => {
         var item = document.createElement('li');
-        item.textContent = msg + ' ' + count;
+        item.textContent = msg;
         messages.appendChild(item);
-        count += 1;
     })
     </script>
 </body>
