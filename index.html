@@ -13,12 +13,9 @@
 
     .container{
         display: flex;
-        /* align-items: center; */
         justify-content: space-evenly;
-        /* gap: 200px; */
-        /* ju */
     }
-    
+
     #form {
         margin-top: 22px;
     }
@@ -28,11 +25,11 @@
     <div class="container">
         <div class="client-container">
             <h1>Client</h1>               
-            <p>Accept Packets</p> 
+            <p>Packet Receive Status:</p> 
             <button id="client-packets">Accept</button>
-            <form id="form" action="">
+            <!-- <form id="form" action="">
                 <input id="input" autocomplete="off" /><button>Send</button>
-            </form>
+            </form> -->
             <ul id="messages"></ul>
         </div>
         <div class="server-container">
@@ -49,8 +46,8 @@
     var socket = io();
     
     var messages = document.getElementById('messages');
-    var form = document.getElementById('form');
-    var input = document.getElementById('input');
+    // var form = document.getElementById('form');
+    // var input = document.getElementById('input');
     var clientPacket = document.getElementById('client-packets');
     var count = 1;
 
@@ -59,17 +56,19 @@
     var serverInput = document.getElementById('server-input');
 
     var serverStartBtn = document.getElementById('start-btn');    
+    let packetCount = 0;
+    let curPacket = 0;
 
     let clientPacketStatus = true;
     clientPacket.style.color = 'green';
 
-    form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    if (input.value) {
-      socket.emit('clientMsg', input.value);
-      input.value = '';
-    }
-    });
+    // form.addEventListener('submit', function(e) {
+    // e.preventDefault();
+    // if (input.value) {
+    //   socket.emit('clientMsg', input.value);
+    //   input.value = '';
+    // }
+    // });
 
     clientPacket.addEventListener('click', () => {
         if(clientPacketStatus){
@@ -91,6 +90,7 @@
             socket.emit('startServer', 'start');
             // console.log(parseInt(serverInput.value));
             let loopCount = parseInt(serverInput.value);
+            curPacket = loopCount;
             console.log(loopCount);
             // for (let index = 0; index < loopCount; index++) {
                 // console.log(loopCount+1);
@@ -120,15 +120,25 @@
         socket.emit('clientAck', 'clientAck');
     })
 
+    socket.on('nack', (msg) => {
+        console.log(msg);
+    })
+
+    socket.on('hell', (msg) => {
+        console.log(msg);
+    })
+
     // if(clientPacketStatus){
         // console.log(clientPacketStatus);
         socket.on('packetR', (msg) => {
+            packetCount++;
             if(clientPacketStatus){
                 var item = document.createElement('li');
                 item.textContent = 'packet ' + msg;
                 messages.appendChild(item);
                 socket.emit('packetAck', ['PacketAck', msg]);
                 console.log('alway runiing');
+                // resendPackets();
             } else {
                 console.log("sad");
             }
@@ -137,6 +147,13 @@
         // console.log(clientPacketStatus);
         // console.log('clientPacketStatus');
     // }
+    const resendPackets = () => {
+        // console.log('outside: ', packetCount, curPacket);
+        if(packetCount !== curPacket){
+            // console.log('inside: ', packetCount, curPacket);
+            socket.emit('nack', 'nack');
+        }
+    }
     </script>
 </body>
 </html>

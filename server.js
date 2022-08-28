@@ -62,6 +62,12 @@ io.on('connection', (socket) => {
         ack.push(msg[1]);
         findMissingAck(ack);
     })
+
+    // socket.emit('nack', (msg) => {
+    //     resendNACKPackets(nack);
+    // })
+
+    // socket.emit('hello', 'nice');
 });
 
 // const io = new Server(app);
@@ -79,22 +85,31 @@ const findMissingAck = (li) => {
     console.log(ack);
     for (let i = 0; i < li.length; i++) {
         if((li[i]-li[i-1]) >= 2){
-            console.log('li shit: ', li[i]+1);
-            nack.push(li[i]+1);
+            console.log('li shit: ', li[i-1]+1);
+            nack.push(li[i-1]+1);
         }        
     }
     checkIfPacketEnd();
 }
 
 const checkIfPacketEnd = () => {
-    // console.log('acklast: ' + ack[ack.length-1]);
-    // console.log('lastPacket: ' + lastPacket)
+    console.log('ack:'+ ack[ack.length-1]);
+    console.log('lastpacket: ' + lastPacket);
     if(ack[ack.length-1] == lastPacket){
-        nackStatus = true;
-        // console.log('nice');
+        nackStatus = true;        
+        console.log('nackStatus: ' + nackStatus);
+        resendNACKPackets(nack);
     }
 }
 
-const resendNACKPackets = () => {
-    
+const resendNACKPackets = (li) => {
+    console.log(li);
+    console.log('nackStatis' + nackStatus);
+    if(nackStatus) {
+        console.log('im in', li);
+        for(let i = 0; i < li.length; i++ ){
+            console.log(li[i]);
+            io.emit('packetR', li[i]);
+        }
+    }
 }
