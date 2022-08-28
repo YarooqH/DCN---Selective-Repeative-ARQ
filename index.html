@@ -18,6 +18,7 @@
         /* gap: 200px; */
         /* ju */
     }
+    
     #form {
         margin-top: 22px;
     }
@@ -29,10 +30,6 @@
             <h1>Client</h1>               
             <p>Accept Packets</p> 
             <button id="client-packets">Accept</button>
-            <!-- <input type="radio" id="client-on" name="client" value="true" checked>
-            <label for="client-on">Accept</label><br>
-            <input type="radio" id="client-off" name="client" value="false">
-            <label for="client-off">Decline</label><br> -->
             <form id="form" action="">
                 <input id="input" autocomplete="off" /><button>Send</button>
             </form>
@@ -79,10 +76,12 @@
             clientPacketStatus = false;
             clientPacket.innerText = 'Decline';
             clientPacket.style.color = 'red';
+            console.log('status changed: ', clientPacketStatus);
         } else {
             clientPacketStatus = true;
             clientPacket.innerText = 'Accept';
             clientPacket.style.color = 'green';
+            console.log('status changed: ', clientPacketStatus);
         }
     })
 
@@ -121,11 +120,23 @@
         socket.emit('clientAck', 'clientAck');
     })
 
-    socket.on('packetR', (msg) => {
-        var item = document.createElement('li');
-        item.textContent = msg;
-        messages.appendChild(item);
-    })
+    // if(clientPacketStatus){
+        // console.log(clientPacketStatus);
+        socket.on('packetR', (msg) => {
+            if(clientPacketStatus){
+                var item = document.createElement('li');
+                item.textContent = 'packet ' + msg;
+                messages.appendChild(item);
+                socket.emit('packetAck', ['PacketAck', msg]);
+                console.log('alway runiing');
+            } else {
+                console.log("sad");
+            }
+        })
+    // } else {
+        // console.log(clientPacketStatus);
+        // console.log('clientPacketStatus');
+    // }
     </script>
 </body>
 </html>

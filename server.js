@@ -7,8 +7,13 @@ const { setInterval } = require('timers');
 const io = new Server(server);
 
 // var io = require('socket.io')(3000)
+let nack = [];
+let ack = [];
+let nackStatus = false;
+let lastPacket;
 
 io.on('connection', (socket) => {
+
     console.log('a user connected');
     socket.on('startServer', () => {
         io.emit('initPacket', 'initPacket');
@@ -30,40 +35,36 @@ io.on('connection', (socket) => {
 
     socket.on('hi', (msg) => {
         var count = 1;
+        lastPacket = msg;
         
         function packetDelay(msg){
             setTimeout(()=>{
                 // console.log(msg);
-                io.emit('packetR', 'packet ' + count);
-                count++;
-                if(count <= msg){
-                    packetDelay(msg);
+                // if(count == 1 || ackCount == count)
+                // if(count == 1 | !nackStatus){
+                    io.emit('packetR', count);
+                    // ackCount = count;
+                    count++;
+                    if(count <= msg){
+                        packetDelay(msg);
                 }
+            // } 
+                // else if (nackStatus){
+                //     io.emit('packetR', nack);
+                // }
             },3000)
         }
         packetDelay(msg);
-        
-        // for (let i = 1; i <= msg; i++) {
-            // console.log(i); 
-            // console.log('msg:' + msg); 
-            // setTimeout(() => {
-            //     console.log(msg);
-            //     io.emit('packetR', 'packet ' + i);                                
-                // if(i == msg) {
-                //     // clearInterval();
-                // } else {
-                // }
-            // },3000)
-        // }
     })
 
-    // socket.on('clientAck', (msg) => {
-    //     io.emit('serverPacket', 'Packet');
-    // })
+    socket.on('packetAck', (msg) => {
+        console.log(msg);
+        ack.push(msg[1]);
+        findMissingAck(ack);
+    })
 });
 
 // const io = new Server(app);
-
 app.get('/', (req, res) => {
     res.sendFile('E:/Just Some Files/C#/index.html');
 })
@@ -73,3 +74,27 @@ server.listen(3000, () => {
 });
 
 // console.log("nice");
+
+const findMissingAck = (li) => {
+    console.log(ack);
+    for (let i = 0; i < li.length; i++) {
+        if((li[i]-li[i-1]) >= 2){
+            console.log('li shit: ', li[i]+1);
+            nack.push(li[i]+1);
+        }        
+    }
+    checkIfPacketEnd();
+}
+
+const checkIfPacketEnd = () => {
+    // console.log('acklast: ' + ack[ack.length-1]);
+    // console.log('lastPacket: ' + lastPacket)
+    if(ack[ack.length-1] == lastPacket){
+        nackStatus = true;
+        // console.log('nice');
+    }
+}
+
+const resendNACKPackets = () => {
+    
+}
