@@ -8,7 +8,6 @@ If an acknowledge is not received of a certain packet by the server then the ser
 
 ![Implementation](./assets/Implementation.gif)
 
-
 ### How to Run?
 
 1. Clone the Repository by running git clone https://github.com/YarooqH/DCN---Selective-Repeative-ARQ
