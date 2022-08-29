@@ -1,5 +1,5 @@
 # Selective Repeat ARQ
-## Implemented using JS, Node, Express and Socket.io
+## Implemented using JS (Node & Express) and Socket.io
 
 Packet Delay (Timer) on the server is set to 3 seconds.
 
