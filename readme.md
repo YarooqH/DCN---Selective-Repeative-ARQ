@@ -8,3 +8,12 @@ If an acknowledge is not received of a certain packet by the server then the ser
 
 ![Implementation](./assets/Implementation.gif)
 
+
+### How to Run?
+
+1. Clone the Repository by running git clone https://github.com/YarooqH/DCN---Selective-Repeative-ARQ
+2. run npm install
+3. Change index.html directory in server.js at line 59 according to your path of index.html
+4. npm run dev
+5. Opens at localhost:3000
+
