@@ -3,7 +3,6 @@ const app = express();
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
-const { setInterval } = require('timers');
 const io = new Server(server);
 
 let nack = [];
@@ -23,12 +22,10 @@ io.on('connection', (socket) => {
     });
 
     socket.on('clientMsg', (msg) => {
-        console.log('msg: ' + msg);
         io.emit('msg', msg);
     });
 
     socket.on('clientAck1', (msg) => {
-        console.log(msg)
         io.emit('serverPacket', 'Packet');
     })
 
@@ -49,7 +46,6 @@ io.on('connection', (socket) => {
     })
 
     socket.on('packetAck', (msg) => {
-        // console.log(msg);
         ack.push(msg[1]);
         findMissingAck(ack);
     })
@@ -65,10 +61,8 @@ server.listen(3000, () => {
 
 
 const findMissingAck = (li) => {
-    // console.log(ack);
     for (let i = 0; i < li.length; i++) {
         if((li[i]-li[i-1]) >= 2){
-            // console.log('li shit: ', li[i-1]+1);
             nack.push(li[i-1]+1);
         }        
     }
@@ -76,20 +70,14 @@ const findMissingAck = (li) => {
 }
 
 const checkIfPacketEnd = () => {
-    // console.log('ack:'+ ack[ack.length-1]);
-    // console.log('lastpacket: ' + lastPacket);
     if(ack[ack.length-1] == lastPacket){
         nackStatus = true;        
-        // console.log('nackStatus: ' + nackStatus);
         resendNACKPackets(nack);
     }
 }
 
 const resendNACKPackets = (li) => {
-    // console.log(li);
-    // console.log('nackStatis' + nackStatus);
     if(nackStatus) {
-        // console.log('im in', li);
         for(let i = 0; i < li.length; i++ ){
             console.log(li[i]);
             io.emit('packetR', li[i]);
